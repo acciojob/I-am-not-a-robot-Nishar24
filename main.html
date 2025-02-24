@@ -1,18 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>I'm not a robot</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main>
-      <!-- solution start -->
-      
-      <!-- solution end -->
-    </main>
-    <script src="./script.js"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Verification</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        .images-container { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        img { width: 100px; height: 100px; cursor: pointer; border: 2px solid transparent; }
+        .selected { border: 2px solid blue; }
+        #buttons-container { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h3 id="h">Please click on the identical tiles to verify that you are not a robot.</h3>
+    <div class="images-container" id="images"></div>
+    <div id="buttons-container">
+        <button id="reset" style="display:none;" onclick="resetGame()">Reset</button>
+        <button id="verify" style="display:none;" onclick="verifySelection()">Verify</button>
+    </div>
+    <p id="para"></p>
+    <script>
+        const imageSources = ["img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg"];
+        let images = [];
+        let selectedImages = [];
+        
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        function loadImages() {
+            let duplicateIndex = Math.floor(Math.random() * 5);
+            images = [...imageSources];
+            images.push(imageSources[duplicateIndex]);
+            shuffle(images);
+            
+            const imageContainer = document.getElementById("images");
+            imageContainer.innerHTML = "";
+            images.forEach((src, index) => {
+                let img = document.createElement("img");
+                img.src = src;
+                img.dataset.index = index;
+                img.onclick = () => selectImage(img);
+                imageContainer.appendChild(img);
+            });
+        }
+        
+        function selectImage(img) {
+            if (selectedImages.length < 2 && !selectedImages.includes(img)) {
+                img.classList.add("selected");
+                selectedImages.push(img);
+                document.getElementById("reset").style.display = "block";
+                if (selectedImages.length === 2) {
+                    document.getElementById("verify").style.display = "block";
+                }
+            }
+        }
+        
+        function resetGame() {
+            selectedImages.forEach(img => img.classList.remove("selected"));
+            selectedImages = [];
+            document.getElementById("reset").style.display = "none";
+            document.getElementById("verify").style.display = "none";
+            document.getElementById("para").textContent = "";
+        }
+        
+        function verifySelection() {
+            document.getElementById("verify").style.display = "none";
+            if (selectedImages[0].src === selectedImages[1].src) {
+                document.getElementById("para").textContent = "You are a human. Congratulations!";
+            } else {
+                document.getElementById("para").textContent = "We can't verify you as a human. You selected the non-identical tiles.";
+            }
+        }
+        
+        loadImages();
+    </script>
+</body>
 </html>
